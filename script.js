@@ -1,78 +1,76 @@
-// Wait until the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Get DOM elements
-    const taskInput = document.getElementById('task-input');
+    // Get references to key elements on the page
     const addButton = document.getElementById('add-task-btn');
+    const taskInput = document.getElementById('task-input');
     const taskList = document.getElementById('task-list');
 
-    // Load saved tasks on page load
+    // Load tasks from local storage when the page loads
     loadTasks();
 
-    // Add task when the button is clicked
+    // Event listener for "Add Task" button
     addButton.addEventListener('click', () => {
         const taskText = taskInput.value.trim();
         if (taskText !== "") {
             addTask(taskText);
-            taskInput.value = ""; // Clear input field
+            taskInput.value = ""; // Clear input
+        } else {
+            alert("Please enter a task.");
         }
     });
 
-    // Add task when Enter key is pressed
+    // Event listener for pressing "Enter" key
     taskInput.addEventListener('keypress', (event) => {
         if (event.key === 'Enter') {
             const taskText = taskInput.value.trim();
             if (taskText !== "") {
                 addTask(taskText);
-                taskInput.value = ""; // Clear input field
+                taskInput.value = "";
+            } else {
+                alert("Please enter a task.");
             }
         }
     });
 
-    // Function to add a new task
-    function addTask(taskText, saveToStorage = true) {
-        // Create the list item
-        const li = document.createElement('li');
-        li.textContent = taskText;
+    // Function to add task to the DOM and local storage
+    function addTask(taskText, save = true) {
+        const li = document.createElement('li'); // Create a list item
+        li.textContent = taskText; // Set task text
 
-        // Create the remove button
-        const removeBtn = document.createElement('button');
-        removeBtn.textContent = 'Remove';
+        const removeBtn = document.createElement('button'); // Create Remove button
+        removeBtn.textContent = "Remove";
         removeBtn.className = 'remove-btn';
 
-        // Remove task on button click
+        // Remove the task when button is clicked
         removeBtn.onclick = () => {
-            taskList.removeChild(li);
-            removeTaskFromStorage(taskText);
+            taskList.removeChild(li); // Remove from page
+            removeTaskFromLocalStorage(taskText); // Remove from storage
         };
 
-        // Append remove button to the task
-        li.appendChild(removeBtn);
-        // Append the task to the list
-        taskList.appendChild(li);
+        li.appendChild(removeBtn); // Add button to task
+        taskList.appendChild(li);  // Add task to list
 
-        // Save to localStorage
-        if (saveToStorage) {
-            saveTaskToStorage(taskText);
+        if (save) {
+            saveTaskToLocalStorage(taskText);
         }
     }
 
-    // Save a task to localStorage
-    function saveTaskToStorage(taskText) {
+    // Save task to local storage
+    function saveTaskToLocalStorage(taskText) {
         const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
         tasks.push(taskText);
         localStorage.setItem('tasks', JSON.stringify(tasks));
     }
 
-    // Remove a task from localStorage
-    function removeTaskFromStorage(taskText) {
+    // Remove task from local storage
+    function removeTaskFromLocalStorage(taskText) {
         let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
         tasks = tasks.filter(task => task !== taskText);
         localStorage.setItem('tasks', JSON.stringify(tasks));
     }
 
-    // Load tasks from localStorage
+    // Load tasks from local storage
     function loadTasks() {
         const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-        tasks.forEach(task => addTask(task, false));
+        tasks.forEach(taskText => addTask(taskText, false)); // false = don’t save again
     }
 });
