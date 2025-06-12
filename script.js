@@ -1,76 +1,78 @@
+// Wait until the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Get references to key elements on the page
-    const addButton = document.getElementById('add-task-btn');
+    // Get DOM elements
     const taskInput = document.getElementById('task-input');
+    const addButton = document.getElementById('add-task-btn');
     const taskList = document.getElementById('task-list');
 
-    // Load tasks from local storage when the page loads
+    // Load saved tasks on page load
     loadTasks();
 
-    // Event listener for "Add Task" button
+    // Add task when the button is clicked
     addButton.addEventListener('click', () => {
         const taskText = taskInput.value.trim();
         if (taskText !== "") {
             addTask(taskText);
-            taskInput.value = ""; // Clear input
-        } else {
-            alert("Please enter a task.");
+            taskInput.value = ""; // Clear input field
         }
     });
 
-    // Event listener for pressing "Enter" key
+    // Add task when Enter key is pressed
     taskInput.addEventListener('keypress', (event) => {
         if (event.key === 'Enter') {
             const taskText = taskInput.value.trim();
             if (taskText !== "") {
                 addTask(taskText);
-                taskInput.value = "";
-            } else {
-                alert("Please enter a task.");
+                taskInput.value = ""; // Clear input field
             }
         }
     });
 
-    // Function to add task to the DOM and local storage
-    function addTask(taskText, save = true) {
-        const li = document.createElement('li'); // Create a list item
-        li.textContent = taskText; // Set task text
+    // Function to add a new task
+    function addTask(taskText, saveToStorage = true) {
+        // Create the list item
+        const li = document.createElement('li');
+        li.textContent = taskText;
 
-        const removeBtn = document.createElement('button'); // Create Remove button
-        removeBtn.textContent = "Remove";
+        // Create the remove button
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'Remove';
         removeBtn.className = 'remove-btn';
 
-        // Remove the task when button is clicked
+        // Remove task on button click
         removeBtn.onclick = () => {
-            taskList.removeChild(li); // Remove from page
-            removeTaskFromLocalStorage(taskText); // Remove from storage
+            taskList.removeChild(li);
+            removeTaskFromStorage(taskText);
         };
 
-        li.appendChild(removeBtn); // Add button to task
-        taskList.appendChild(li);  // Add task to list
+        // Append remove button to the task
+        li.appendChild(removeBtn);
+        // Append the task to the list
+        taskList.appendChild(li);
 
-        if (save) {
-            saveTaskToLocalStorage(taskText);
+        // Save to localStorage
+        if (saveToStorage) {
+            saveTaskToStorage(taskText);
         }
     }
 
-    // Save task to local storage
-    function saveTaskToLocalStorage(taskText) {
+    // Save a task to localStorage
+    function saveTaskToStorage(taskText) {
         const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
         tasks.push(taskText);
         localStorage.setItem('tasks', JSON.stringify(tasks));
     }
 
-    // Remove task from local storage
-    function removeTaskFromLocalStorage(taskText) {
+    // Remove a task from localStorage
+    function removeTaskFromStorage(taskText) {
         let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
         tasks = tasks.filter(task => task !== taskText);
         localStorage.setItem('tasks', JSON.stringify(tasks));
     }
 
-    // Load tasks from local storage
+    // Load tasks from localStorage
     function loadTasks() {
         const tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-        tasks.forEach(taskText => addTask(taskText, false)); // false = don’t save again
+        tasks.forEach(task => addTask(task, false));
     }
 });
